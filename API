@@ -1,6 +1,11 @@
 # importing requests for http communication and mysql.connector for connection to sql database
 import requests
-import mysql.
+import mysql.connector
+from flask import Flask, request
+from flask_restful import Resource, Api
+from sqlalchemy import create_engine
+import json
+from json import dumps
 
 # requesting login information from user for sql database (so username and password is not displayed in program)
 host_value = input("Enter the host name:")
@@ -18,50 +23,48 @@ mydb = mysql.connector.connect(
     database = database_value
     )
     
-# parsing GET request to obtain data needed for search in SQL   
-get_request = "/menu/2021-03-03/MEAL_KIT"
-year = get_request[6:10]
-month = get_request[11:13]
-day = get_request[14:16]
-type_meal = get_request[17:25]
-print(year)
-print(month)
-print(day)
-print(type_meal)
+class MealCheck():
+    def get(self):
+        # parsing GET request to obtain data needed for search in SQL  
+        get_request = "/menu/2021-03-08/MEAL_KIT"
+        year = int(get_request[6:10])
+        month = int(get_request[11:13])
+        day = int(get_request[14:16])
+        type_meal = (get_request[17:25])
+        week_id_no = 0
+        meal_id_no = []
+        meal_names = []
 
-#printing all information from sql
-print("week")
-mycursor = mydb.cursor()
-mycursor.execute("SHOW COLUMNS FROM week")
-for x in mycursor:
-  print(x)
-  
-print("meal week")
-mycursor2 = mydb.cursor()
-mycursor2.execute("SHOW COLUMNS FROM meal_week")
-for x in mycursor2:
-  print(x)
-  
-print("meal")
-mycursor3 = mydb.cursor()
-mycursor3.execute("SHOW COLUMNS FROM meal")
-for x in mycursor3:
-  print(x)
+        # Finding the week id number based on the date input and the range in which it falls
+        mycursor7 = mydb.cursor()
+        mycursor7.execute("SELECT start_date, end_date, id FROM week")
+        for a in mycursor7:
+            x = str(a[0]) + str(a[1]) + str(a[2])
+            x = x.replace("(","")
+            x = x.replace(")","")
+            x = x.replace(".","")
+            x = x.replace(" ","")
+            x = x.replace(",","")
+            x = x.replace("-","")
+            x = x.replace("datetimedate","")
+            if ((year >= int(x[0:4])) and (year <= int(x[8:12]))):
+                if ((month >= int(x[4:6])) and (month <= int(x[12:14]))):
+                    if((day >= int(x[6:8])) and ((day <= int(x[14:16]) or ((month == int(x[4:6])) and (month < int(x[12:14])))))):
+                        week_id_no = x[16:20]
 
-print("week_info")
-mycursor4 = mydb.cursor()
-mycursor4.execute("SELECT id, start_date, end_date FROM week")
-for x in mycursor4:
-  print(x)
 
-print("meal_week_info")
-mycursor5 = mydb.cursor()
-mycursor5.execute("SELECT week_id, meal_id FROM meal_week")
-for x in mycursor5:
-  print(x)
+        # Finding meal id numbers associated with the identified week id number
+        mycursor8 = mydb.cursor()
+        mycursor8.execute("SELECT week_id, meal_id FROM meal_week")
+        for a in mycursor8:
+            if str(a[0]) == str(week_id_no):
+                meal_id_no.append(a[1])
 
-print("meal_info")
-mycursor6 = mydb.cursor()
-mycursor6.execute("SELECT id, name, type FROM meal")
-for x in mycursor6:
-  print(x)
+        # Finding meals associated with the identified meal id numbers and input meal type
+        mycursor9 = mydb.cursor()
+        mycursor9.execute("SELECT id, name, type FROM meal")
+        for a in mycursor9:
+          if (a[0] in meal_id_no) and (str(a[2]) == str(type_meal)):
+              meal_names.append(a[1])
+        print(json.dumps(meal_names))
+      
