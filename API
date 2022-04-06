@@ -23,7 +23,7 @@ mydb = mysql.connector.connect(
     database = database_value
     )
     
-class MealCheck():
+class MealCheck(Resource):
     def get(self):
         # parsing GET request to obtain data needed for search in SQL  
         get_request = "/menu/2021-03-08/MEAL_KIT"
@@ -64,7 +64,11 @@ class MealCheck():
         mycursor9 = mydb.cursor()
         mycursor9.execute("SELECT id, name, type FROM meal")
         for a in mycursor9:
-          if (a[0] in meal_id_no) and (str(a[2]) == str(type_meal)):
-              meal_names.append(a[1])
-        print(json.dumps(meal_names))
+            if (a[0] in meal_id_no) and (str(a[2]) == str(type_meal)):
+                meal_names.append(a[1])
+            if meal_names != []:
+                HTTP_Response = 200
+                return((json.dumps(meal_names)), HTTP_Response)
+            else:
+                return(HTTP_Response)
       
