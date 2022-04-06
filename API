@@ -1,0 +1,20 @@
+import requests
+import mysql.connector
+host_value = input("Enter the host name:")
+port_number = input("Enter the port number:")
+database_value = input("Enter the database/schema:")
+user_name = input("Enter your username:")
+password = input("Enter your password:")
+mydb = mysql.connector.connect(
+    host = host_value,
+    port = port_number,
+    user = user_name,
+    password = password,
+    database = database_value
+    )
+mycursor = mydb.cursor()
+
+mycursor.execute("SHOW TABLES")
+
+for x in mycursor:
+  print(x)
