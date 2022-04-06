@@ -1,10 +1,15 @@
+# importing requests for http communication and mysql.connector for connection to sql database
 import requests
-import mysql.connector
+import mysql.
+
+# requesting login information from user for sql database (so username and password is not displayed in program)
 host_value = input("Enter the host name:")
 port_number = input("Enter the port number:")
 database_value = input("Enter the database/schema:")
 user_name = input("Enter your username:")
 password = input("Enter your password:")
+
+#connecting to sql database
 mydb = mysql.connector.connect(
     host = host_value,
     port = port_number,
@@ -12,9 +17,51 @@ mydb = mysql.connector.connect(
     password = password,
     database = database_value
     )
+    
+# parsing GET request to obtain data needed for search in SQL   
+get_request = "/menu/2021-03-03/MEAL_KIT"
+year = get_request[6:10]
+month = get_request[11:13]
+day = get_request[14:16]
+type_meal = get_request[17:25]
+print(year)
+print(month)
+print(day)
+print(type_meal)
+
+#printing all information from sql
+print("week")
 mycursor = mydb.cursor()
-
-mycursor.execute("SHOW TABLES")
-
+mycursor.execute("SHOW COLUMNS FROM week")
 for x in mycursor:
+  print(x)
+  
+print("meal week")
+mycursor2 = mydb.cursor()
+mycursor2.execute("SHOW COLUMNS FROM meal_week")
+for x in mycursor2:
+  print(x)
+  
+print("meal")
+mycursor3 = mydb.cursor()
+mycursor3.execute("SHOW COLUMNS FROM meal")
+for x in mycursor3:
+  print(x)
+
+print("week_info")
+mycursor4 = mydb.cursor()
+mycursor4.execute("SELECT id, start_date, end_date FROM week")
+for x in mycursor4:
+  print(x)
+
+print("meal_week_info")
+mycursor5 = mydb.cursor()
+mycursor5.execute("SELECT week_id, meal_id FROM meal_week")
+for x in mycursor5:
+  print(x)
+
+print("meal_info")
+mycursor6 = mydb.cursor()
+mycursor6.execute("SELECT id, name, type FROM meal")
+for x in mycursor6:
   print(x)
