@@ -31,6 +31,9 @@ async def read_item(date_id, type_id):
     except :
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'Sorry, no meals are available on this date.')
+    if (get_request[10:11] != "-") or (get_request[13:14] != "-"):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f'Sorry, no meals are available on this date.')
     week_id_no = 0
     meal_id_no = []
     meal_names = []
